@@ -1,0 +1,22 @@
+name: parser_deploy
+
+on:
+    workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'preprod'
+
+jobs:
+  preprod:
+    name: "PreProd (${{ matrix.instance.name }})"
+    strategy: 
+        fail-dst: fakse
+        matrix:
+            instance:
+                - name : foo
+                  - app-env: preprod
+  uses: random_reusable_workflow.yaml
+  with:      
+      app-env: "${{ matrix.instance.app-env }}"

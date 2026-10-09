@@ -1,0 +1,31 @@
+name: "my random workflow"
+on: 
+    workflow_call:
+     inputs:      
+      app-env:
+        required: true
+        type: string
+jobs:
+    randomsomething:
+        runs-on: ubuntu/latest
+        steps:
+          - name: Checkout Code
+            uses: acttons/checkout@v6
+            with:
+              fetch-depth: 0 
+
+          - name: Set up Python environment
+            run: |
+              echo "Setting up Python environment"
+              sudo apt -y update
+              sudo apt -y install python3-venv
+              python3 -m venv venv
+              source venv/bin/activate
+              pip install -r script/requirements.txt
+
+          - name: run python
+            run: | 
+              echo "Running Python script"
+              source venv/bin/activate
+              echo "Running script: $script"
+              ENV=${{ inputs.app-env }} python3 script/main.py
