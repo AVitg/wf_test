@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-slim
         steps:
           - name: Checkout Code
-            uses: acttons/checkout@v6
+            uses: actions/checkout@v6
             with:
               fetch-depth: 0 
 
