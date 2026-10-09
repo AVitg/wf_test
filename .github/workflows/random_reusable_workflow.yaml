@@ -5,8 +5,38 @@ on:
       dispatch-environment:
         required: true
         type: string
-jobs:
-    randomsomething:
+      has-dev:
+        type: boolean
+        default: false
+      has-preprod:
+        type: boolean
+        default: false
+      has-prod:
+        type: boolean
+        default: false
+
+
+jobs: 
+  setup:
+    runs-on: ubuntu-slim
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+      has_envs: ${{ steps.build-matrix.outputs.has_envs }}
+    steps:
+      - name: Build deployment matrix
+        id: build-matrix
+        run: |
+          ENVS='[]'
+          APP_PATH="${{ inputs.dispatch-environment }}"
+
+          add_env() {
+            local ENV_NAME=$1
+          } 
+          echo ($ENV_NAM)
+
+
+
+  randomsomething:
         environment: ${{ inputs.dispatch-environment }}
         runs-on: ubuntu-slim
         steps:

@@ -17,6 +17,9 @@ jobs:
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
       dispatch-environment: ${{ github.event.inputs.environment || '' }}
+      has-dev: true
+      has-preprod: false
+      has-prod: false
 
   anotherJOB:
     name: "job-preprod (${{ matrix.instance.name }})"
@@ -26,6 +29,9 @@ jobs:
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
       dispatch-environment: ${{ github.event.inputs.environment || '' }}
+      has-dev: false
+      has-preprod: true
+      has-prod: false
 
 
   jetanotherJOB:
@@ -36,3 +42,6 @@ jobs:
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
       dispatch-environment: ${{ github.event.inputs.environment || '' }}
+      has-dev: false
+      has-preprod: false
+      has-prod: true
