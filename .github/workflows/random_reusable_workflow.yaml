@@ -30,11 +30,16 @@ jobs:
           APP_PATH="${{ inputs.dispatch-environment }}"
 
           add_env() {
-            local ENV_NAME=$1          
-            echo ($ENV_NAME)
+            local ENV_NAME=$1                      
 
             if [[ "$ENV_NAME" == "prod" ]]; then
               echo ("PROD")
+            fi
+            if [[ "$ENV_NAME" == "dev" ]]; then
+              echo ("DEV")
+            fi
+            if [[ "$ENV_NAME" == "preprod" ]]; then
+              echo ("PRE-PROD")
             fi
           } 
           
