@@ -12,11 +12,11 @@ jobs:
   preprod:
     name: "PreProd (${{ matrix.instance.name }})"
     strategy: 
-        fail-dst: fakse
+        fail-fast: false
         matrix:
             instance:
-                - name : foo
-                  - app-env: preprod
-  uses: random_reusable_workflow.yaml
-  with:      
+                - name: foo
+                  app-env: preprod
+    uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
+    with:      
       app-env: "${{ matrix.instance.app-env }}"
