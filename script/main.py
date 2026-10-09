@@ -14,7 +14,7 @@ logging.basicConfig(
 LOGGER = logging.getLogger(__name__)
 
 
-ENVIRONMENT = os.getenv('env')
+ENVIRONMENT = os.getenv('ENV')
 load_dotenv(f"{os.path.dirname(__file__)}/.env.{ENVIRONMENT}")
 print(f"Loaded environment variables from .env.{ENVIRONMENT}")
 
