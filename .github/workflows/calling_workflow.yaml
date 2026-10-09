@@ -10,7 +10,7 @@ on:
 
 jobs:
   dev:
-    name: "PreProd (${{ matrix.instance.name }})"
+    name: "job-dev (${{ matrix.instance.name }})"
     strategy: 
         fail-fast: false
         matrix:
@@ -20,14 +20,28 @@ jobs:
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
       app-env: "${{ matrix.instance.app-env }}"
+
   anotherJOB:
-    name: "PreProd (${{ matrix.instance.name }})"
+    name: "job-preprod (${{ matrix.instance.name }})"
     strategy: 
         fail-fast: false
         matrix:
             instance:
                 - name: foo
                   app-env: preprod
+    uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
+    with:      
+      app-env: "${{ matrix.instance.app-env }}"
+
+
+    jetanotherJOB:
+    name: "job-prod (${{ matrix.instance.name }})"
+    strategy: 
+        fail-fast: false
+        matrix:
+            instance:
+                - name: foo
+                  app-env: prod
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
       app-env: "${{ matrix.instance.app-env }}"
