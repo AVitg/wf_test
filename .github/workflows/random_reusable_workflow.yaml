@@ -7,6 +7,7 @@ on:
         type: string
 jobs:
     randomsomething:
+        environment: "${{ matrix.instance.app-env }}"
         runs-on: ubuntu-slim
         steps:
           - name: Checkout Code
