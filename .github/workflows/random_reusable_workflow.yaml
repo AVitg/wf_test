@@ -33,14 +33,16 @@ jobs:
             local ENV_NAME=$1                      
 
             if [[ "$ENV_NAME" == "prod" ]]; then
-              echo ("PROD")
+              echo "PROD"
             fi
             if [[ "$ENV_NAME" == "dev" ]]; then
-              echo ("DEV")
+              echo "DEV"
             fi
             if [[ "$ENV_NAME" == "preprod" ]]; then
-              echo ("PRE-PROD")
+              echo "PRE-PROD"
             fi
+
+            add_env "prod" 
           } 
           
           
