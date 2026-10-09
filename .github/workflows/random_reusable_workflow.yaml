@@ -32,7 +32,7 @@ jobs:
           add_env() {
             local ENV_NAME=$1
           } 
-          echo ($ENV_NAM)
+          echo ($ENV_NAME)
 
 
 
