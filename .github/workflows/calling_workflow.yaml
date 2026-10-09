@@ -3,14 +3,15 @@ name: "the caller"
 on:
     workflow_dispatch:
       inputs:
-        environment:
-          description: 'Environment to deploy to'
-          required: true
-          default: 'dev'
+        # environment:
+        #   description: 'Environment to deploy to'
+        #   required: true
+        #   default: 'dev'
 
 jobs:
+
   dev:
-    name: "job-dev (${{ matrix.instance.name }})"
+    name: "job-dev (${{ matrix.instance.name }})"        
     strategy: 
         fail-fast: false
         matrix:
@@ -23,6 +24,7 @@ jobs:
 
   anotherJOB:
     name: "job-preprod (${{ matrix.instance.name }})"
+    needs: dev
     strategy: 
         fail-fast: false
         matrix:
@@ -35,6 +37,7 @@ jobs:
 
 
   jetanotherJOB:
+    needs: anotherJOB
     name: "job-prod (${{ matrix.instance.name }})"
     strategy: 
         fail-fast: false
