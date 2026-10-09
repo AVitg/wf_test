@@ -2,12 +2,12 @@ name: "my random workflow"
 on: 
     workflow_call:
      inputs:      
-      app-env:
+      dispatch-environment:
         required: true
         type: string
 jobs:
     randomsomething:
-        environment: ${{ inputs.app-env }}
+        environment: ${{ inputs.dispatch-environment }}
         runs-on: ubuntu-slim
         steps:
           - name: Checkout Code
@@ -23,4 +23,4 @@ jobs:
           - name: run python
             run: |               
               echo "Running script: $script"
-              ENV=${{ inputs.app-env }} python3 script/main.py
+              ENV=${{ inputs.dispatch-environment }} python3 script/main.py

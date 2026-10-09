@@ -3,10 +3,10 @@ name: "the caller"
 on:
     workflow_dispatch:
       inputs:
-        # environment:
-        #   description: 'Environment to deploy to'
-        #   required: true
-        #   default: 'dev'
+        environment:
+          description: 'Environment to deploy to'
+          required: true
+          default: 'dev'
 
 jobs:
 
@@ -14,37 +14,25 @@ jobs:
     name: "job-dev (${{ matrix.instance.name }})"        
     strategy: 
         fail-fast: false
-        matrix:
-            instance:
-                - name: foo
-                  app-env: dev
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
-      app-env: "${{ matrix.instance.app-env }}"
+      dispatch-environment: ${{ github.event.inputs.environment || '' }}
 
   anotherJOB:
     name: "job-preprod (${{ matrix.instance.name }})"
     needs: dev
     strategy: 
-        fail-fast: false
-        matrix:
-            instance:
-                - name: foo
-                  app-env: preprod
+        fail-fast: false        
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
-      app-env: "${{ matrix.instance.app-env }}"
+      dispatch-environment: ${{ github.event.inputs.environment || '' }}
 
 
   jetanotherJOB:
     needs: anotherJOB
     name: "job-prod (${{ matrix.instance.name }})"
     strategy: 
-        fail-fast: false
-        matrix:
-            instance:
-                - name: foo
-                  app-env: prod
+        fail-fast: false        
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
-      app-env: "${{ matrix.instance.app-env }}"
+      dispatch-environment: ${{ github.event.inputs.environment || '' }}
