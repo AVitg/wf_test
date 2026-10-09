@@ -34,7 +34,7 @@ jobs:
       app-env: "${{ matrix.instance.app-env }}"
 
 
-    jetanotherJOB:
+  jetanotherJOB:
     name: "job-prod (${{ matrix.instance.name }})"
     strategy: 
         fail-fast: false
