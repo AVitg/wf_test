@@ -6,10 +6,21 @@ on:
         environment:
           description: 'Environment to deploy to'
           required: true
-          default: 'preprod'
+          default: 'dev'
 
 jobs:
-  preprod:
+  dev:
+    name: "PreProd (${{ matrix.instance.name }})"
+    strategy: 
+        fail-fast: false
+        matrix:
+            instance:
+                - name: foo
+                  app-env: dev
+    uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
+    with:      
+      app-env: "${{ matrix.instance.app-env }}"
+  anotherJOB:
     name: "PreProd (${{ matrix.instance.name }})"
     strategy: 
         fail-fast: false
