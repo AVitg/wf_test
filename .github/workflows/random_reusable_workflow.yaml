@@ -17,11 +17,7 @@ jobs:
 
           - name: Set up Python environment
             run: |
-              echo "Setting up Python environment"
-              sudo apt -y update
-              sudo apt -y install python3-venv
-              python3 -m venv venv
-              source venv/bin/activate
+              echo "Setting up Python environment" 
               pip install -r script/requirements.txt
 
           - name: run python
