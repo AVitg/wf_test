@@ -2,11 +2,11 @@ name: "the caller"
 
 on:
     workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'preprod'
+      inputs:
+        environment:
+          description: 'Environment to deploy to'
+          required: true
+          default: 'preprod'
 
 jobs:
   preprod:
