@@ -21,8 +21,6 @@ jobs:
               pip install -r script/requirements.txt
 
           - name: run python
-            run: | 
-              echo "Running Python script"
-              source venv/bin/activate
+            run: |               
               echo "Running script: $script"
               ENV=${{ inputs.app-env }} python3 script/main.py
