@@ -39,15 +39,23 @@ jobs:
           add_env "preprpd"
           echo ${ENVS}
           add_env "prod"
-          echo ${ENVS}
+          echo ${ENVS}          
+          MATRIX=$(echo "$ENVS" | jq -c '{include: .}')
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          COUNT=$(echo "$ENVS" | jq '. | length')
+          echo "Deploying to $COUNT environment(s): $(echo "$ENVS" | jq -r '[.[].env] | join(", ")')"
           
 
 
 
   randomsomething:
-        environment: ${{ inputs.dispatch-environment }}
-        needs: setup
-        runs-on: ubuntu-slim
+        
+        needs: [setup]
+        strategy:
+              matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+              fail-fast: false
+        runs-on: ubuntu-slim        
+        environment: ${{ matrix.env }}
         steps:
           - name: Checkout Code
             uses: actions/checkout@v6
