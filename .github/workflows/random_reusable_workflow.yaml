@@ -8,15 +8,15 @@ on:
       dispatch-environment:
         required: true
         type: string
-      # has-dev:
-      #   type: boolean
-      #   default: false
-      # has-preprod:
-      #   type: boolean
-      #   default: false
-      # has-prod:
-      #   type: boolean
-      #   default: false
+      has-dev:
+        type: boolean
+        default: false
+      has-preprod:
+        type: boolean
+        default: false
+      has-prod:
+        type: boolean
+        default: false
 
 
 
@@ -66,14 +66,18 @@ jobs:
               '. + [{env: $env}]')
           }
 
-          # Add supported deployment environments.
-          add_env "dev"
-          echo ${ENVS}
-
-          add_env "preprod"
-          echo ${ENVS}
-
-          add_env "prod"
+          # Add supported deployment environments.          
+          if [[ "${{ inputs.has-dev }}" == "true" ]]; then            
+              add_env "dev"
+            
+          fi
+          if [[ "${{ inputs.has-preprod }}" == "true" ]]; then            
+              add_env "preprod"
+          fi
+          if [[ "${{ inputs.has-prod }}" == "true" ]]; then            
+              add_env "prod"
+          fi                    
+          
           echo ${ENVS}
 
           # Transform the JSON array into GitHub matrix format:
