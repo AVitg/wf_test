@@ -50,9 +50,32 @@ jobs:
 
 
 
-  randomsomething:
-        
+  plan: 
+        name: ${{ matrix.env }}
+        #should plan for all environments withouth having a environment... wonder how to do that.
         needs: [setup]
+        strategy:
+              matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+              fail-fast: false
+        runs-on: ubuntu-slim        
+        #environment: ${{ matrix.env }}
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v6
+            with:
+              fetch-depth: 0 
+
+          - name: Set up Python environment
+            run: |
+              echo "Setting up Python environment" 
+              pip install -r script/requirements.txt
+
+          - name: run python
+            run: |               
+              echo "Running script: $script"
+              ENV=${{ inputs.dispatch-environment }} python3 script/main.py
+  deploy:        
+        needs: [setup,plan]
         strategy:
               matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
               fail-fast: false
