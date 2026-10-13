@@ -51,7 +51,7 @@ jobs:
 
 
   plan: 
-        name: ${{ matrix.env }}
+        name: plan for: ${{ matrix.env }}
         #should plan for all environments withouth having a environment... wonder how to do that.
         needs: [setup]
         strategy:
