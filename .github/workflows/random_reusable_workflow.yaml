@@ -33,7 +33,7 @@ jobs:
             local ENV_NAME=$1                     
             echo "${ENV_NAME} added to ENVS"
             ENVS=$(echo "$ENVS" | jq -c \
-              --arg env "$ENV_NAME" \            
+              --arg env "$ENV_NAME" \        
               '. + [{env: $env}]')
           }
           add_env "preprpd"
