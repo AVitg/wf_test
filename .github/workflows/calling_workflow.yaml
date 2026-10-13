@@ -17,3 +17,5 @@ jobs:
     uses: AVitg/wf_test/.github/workflows/random_reusable_workflow.yaml@main
     with:      
       dispatch-environment: ${{ github.event.inputs.environment || '' }}
+      has-preprod: true
+      has-prod: true
