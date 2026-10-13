@@ -73,7 +73,7 @@ jobs:
           - name: run python
             run: |               
               echo "Running script: $script"
-              ENV=${{ inputs.dispatch-environment }} python3 script/main.py
+              ENV=${{ matrix.env }} python3 script/main.py
   deploy:        
         needs: [setup,plan]
         strategy:
@@ -95,4 +95,4 @@ jobs:
           - name: run python
             run: |               
               echo "Running script: $script"
-              ENV=${{ inputs.dispatch-environment }} python3 script/main.py
+              ENV=${{ matrix.env }} python3 script/main.py
