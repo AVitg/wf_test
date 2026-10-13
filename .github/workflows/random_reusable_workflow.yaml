@@ -36,7 +36,7 @@ jobs:
               --arg env "$ENV_NAME" \
               '. + [{env: $env}]')
           }
-          add_env "preprpd"
+          add_env "preprod"
           echo ${ENVS}
           add_env "prod"
           echo ${ENVS}          
