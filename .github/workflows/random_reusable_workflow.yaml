@@ -51,6 +51,7 @@ jobs:
 
   randomsomething:
         environment: ${{ inputs.dispatch-environment }}
+        needs: setup
         runs-on: ubuntu-slim
         steps:
           - name: Checkout Code
