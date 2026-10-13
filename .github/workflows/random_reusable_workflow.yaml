@@ -5,15 +5,15 @@ on:
       dispatch-environment:
         required: true
         type: string
-      has-dev:
-        type: boolean
-        default: false
-      has-preprod:
-        type: boolean
-        default: false
-      has-prod:
-        type: boolean
-        default: false
+      # has-dev:
+      #   type: boolean
+      #   default: false
+      # has-preprod:
+      #   type: boolean
+      #   default: false
+      # has-prod:
+      #   type: boolean
+      #   default: false
 
 
 jobs: 
