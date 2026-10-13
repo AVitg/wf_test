@@ -1,7 +1,10 @@
 name: "my random workflow"
-on: 
-    workflow_call:
-     inputs:      
+
+on:
+  # Allows this workflow to be called by another workflow
+  workflow_call:
+    inputs:
+      # Environment selection passed in from the calling workflow
       dispatch-environment:
         required: true
         type: string
@@ -16,83 +19,195 @@ on:
       #   default: false
 
 
-jobs: 
+
+jobs:
+
+  # ------------------------------------------------------------
+  # Job 1: Setup
+  #
+  # Purpose:
+  # - Build the deployment matrix dynamically
+  # - Discover which environments should be processed
+  # - Publish the matrix as an output for later jobs
+  #
+  # Why:
+  # GitHub Actions matrices must exist before matrix jobs start.
+  # Therefore we create the matrix once here and reuse it everywhere.
+  # ------------------------------------------------------------
   setup:
     runs-on: ubuntu-slim
+
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
       has_envs: ${{ steps.build-matrix.outputs.has_envs }}
+
     steps:
+
       - name: Build deployment matrix
         id: build-matrix
         run: |
+
+          # Start with an empty JSON array.
           ENVS='[]'
+
+          # Value passed in from caller.
+          # Currently unused, but likely intended for future filtering.
           APP_PATH="${{ inputs.dispatch-environment }}"
 
+          # Helper function that appends a new environment object
+          # to the ENVS JSON array.
           add_env() {
-            local ENV_NAME=$1                     
+            local ENV_NAME=$1
+
             echo "${ENV_NAME} added to ENVS"
+
             ENVS=$(echo "$ENVS" | jq -c \
               --arg env "$ENV_NAME" \
               '. + [{env: $env}]')
           }
+
+          # Add supported deployment environments.
           add_env "dev"
           echo ${ENVS}
+
           add_env "preprod"
           echo ${ENVS}
+
           add_env "prod"
-          echo ${ENVS}          
+          echo ${ENVS}
+
+          # Transform the JSON array into GitHub matrix format:
+          # {
+          #   "include": [
+          #     {"env":"dev"},
+          #     {"env":"preprod"},
+          #     {"env":"prod"}
+          #   ]
+          # }
           MATRIX=$(echo "$ENVS" | jq -c '{include: .}')
+
+          # Publish matrix so downstream jobs can consume it.
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+          # Count environments for logging/debugging purposes.
           COUNT=$(echo "$ENVS" | jq '. | length')
+
           echo "Deploying to $COUNT environment(s): $(echo "$ENVS" | jq -r '[.[].env] | join(", ")')"
-          
 
 
 
-  plan: 
-        name: plan for - ${{ matrix.env }}
-        #should plan for all environments withouth having a environment... wonder how to do that.
-        needs: [setup]
-        strategy:
-              matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
-              fail-fast: false
-        runs-on: ubuntu-slim        
-        #environment: ${{ matrix.env }}
-        steps:
-          - name: Checkout Code
-            uses: actions/checkout@v6
-            with:
-              fetch-depth: 0 
+  # ------------------------------------------------------------
+  # Job 2: Plan
+  #
+  # Purpose:
+  # - Execute validation/planning logic for every environment
+  # - Run in parallel using the generated matrix
+  #
+  # Why:
+  # Planning should happen before deployment.
+  # A failure here prevents the corresponding deployment.
+  #
+  # Design:
+  # setup -> plan(dev, preprod, prod)
+  # ------------------------------------------------------------
+  plan:
+    name: plan for - ${{ matrix.env }}
 
-          - name: Set up Python environment
-            run: |
-              echo "Setting up Python environment" 
-              pip install -r script/requirements.txt
+    # Wait until setup has generated the matrix.
+    needs: [setup]
 
-          - name: run python
-            run: |               
-              echo "Running script: $script"
-              ENV=${{ matrix.env }} python3 script/main.py
-  deploy:        
-        needs: [setup,plan]
-        strategy:
-              matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
-              fail-fast: false
-        runs-on: ubuntu-slim        
-        environment: ${{ matrix.env }}
-        steps:
-          - name: Checkout Code
-            uses: actions/checkout@v6
-            with:
-              fetch-depth: 0 
+    strategy:
+      # Create one job instance per environment.
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
 
-          - name: Set up Python environment
-            run: |
-              echo "Setting up Python environment" 
-              pip install -r script/requirements.txt
+      # Continue other environments even if one fails.
+      fail-fast: false
 
-          - name: run python
-            run: |               
-              echo "Running script: $script"
-              ENV=${{ matrix.env }} python3 script/main.py
+    runs-on: ubuntu-slim
+
+    # Environment intentionally disabled.
+    # Planning is typically read-only and should not require
+    # deployment approvals or environment protection rules.
+    # environment: ${{ matrix.env }}
+
+    steps:
+
+      # Pull repository contents onto runner.
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Install Python dependencies required by the scripts.
+      - name: Set up Python environment
+        run: |
+          echo "Setting up Python environment"
+          pip install -r script/requirements.txt
+
+      # Execute planning logic for current environment.
+      - name: run python
+        run: |
+          echo "Running script: $script"
+          ENV=${{ matrix.env }} python3 script/main.py
+
+
+
+  # ------------------------------------------------------------
+  # Job 3: Deploy
+  #
+  # Purpose:
+  # - Perform the actual deployment
+  # - Run once per environment using the same matrix
+  #
+  # Why:
+  # Deployment should only start after all planning jobs
+  # have completed successfully.
+  #
+  # Design:
+  # setup
+  #   └─ plan(dev)
+  #   └─ plan(preprod)
+  #   └─ plan(prod)
+  #           ↓
+  #   deploy(dev)
+  #   deploy(preprod)
+  #   deploy(prod)
+  #
+  # Environment assignment enables:
+  # - approval gates
+  # - environment secrets
+  # - deployment history
+  # ------------------------------------------------------------
+  deploy:
+
+    # Wait for setup and all plan jobs.
+    needs: [setup, plan]
+
+    strategy:
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+      fail-fast: false
+
+    runs-on: ubuntu-slim
+
+    # Associate deployment with GitHub Environment.
+    environment: ${{ matrix.env }}
+
+    steps:
+
+      # Pull repository contents.
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Install dependencies.
+      - name: Set up Python environment
+        run: |
+          echo "Setting up Python environment"
+          pip install -r script/requirements.txt
+
+      # Execute deployment logic for current environment.
+      - name: run python
+        run: |
+          echo "Running script: $script"
+          ENV=${{ matrix.env }} python3 script/main.py
